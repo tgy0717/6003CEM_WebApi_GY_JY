@@ -1,0 +1,167 @@
+@import './base.css';
+
+/* #app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-weight: normal;
+}
+
+a,
+.green {
+  text-decoration: none;
+  color: hsla(160, 100%, 37%, 1);
+  transition: 0.4s;
+  padding: 3px;
+}
+
+@media (hover: hover) {
+  a:hover {
+    background-color: hsla(160, 100%, 37%, 0.2);
+  }
+}
+
+@media (min-width: 1024px) {
+  body {
+    display: flex;
+    place-items: center;
+  }
+
+  #app {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 0 2rem;
+  } 
+}*/
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.movie-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+  justify-content: center;
+  padding: 50px;
+}
+
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+  justify-content: center; 
+}
+
+.movie-card { 
+  width: 100%;
+  max-width: 300px;
+  background-color: #222; /* Dark background for contrast */
+  border-radius: 20px;
+  overflow: hidden;
+  text-align: left;
+}
+
+.movie-image:hover {
+
+  filter: brightness(0.85);
+  transform: scale(0.99);
+}
+
+.movie-image {
+  width: 100%;
+  height: 400px; 
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.2s ease-in-out, filter 0.2s ease-in-out;
+  position: relative;
+}
+
+.overlay {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 50%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+  z-index: 2;
+}
+
+.movie-details {
+  width: 100%;
+  position: absolute;
+  bottom: 0; 
+  color: white;
+  font-weight: bold;
+  z-index: 10;
+  display: none;
+}
+
+.movie-image:hover .movie-details { 
+  display: block;
+  width: 100%;
+  color: white;
+  background: rgba(0, 0, 0, 0.5); /* Black with transparency */  
+  z-index: 10;
+}
+
+.movie-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+  text-align: center;
+  padding: 5px; 
+  white-space: break-spaces;
+} 
+
+.movie-info {
+  width: 100%;
+  padding: 5px;
+  font-size: 18px;
+}
+
+/* View More Link */
+.view-more {
+  display: block;
+  margin-top: 5px;
+  color: lightblue;
+  text-decoration: none;
+  font-size: 14px;
+  padding: 5px;
+}
+
+.view-more:hover {
+  text-decoration: underline;
+}
+
+/* Loading Text */
+.loading {
+  text-align: center;
+  font-size: 16px;
+  color: gray;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .movie-grid {
+    grid-template-columns: repeat(2, 250px);
+  }
+}
+
+@media (max-width: 600px) {
+  .movie-grid {
+    grid-template-columns: repeat(1, 250px);  
+  }
+}
+
+a {
+  display: block;
+  margin-top: 10px;
+  text-decoration: none;
+  color: #007bff;
+  font-weight: bold;
+}
+
+a:hover {
+  text-decoration: underline;
+}
