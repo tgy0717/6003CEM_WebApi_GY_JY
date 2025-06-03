@@ -1,5 +1,12 @@
 <template>
     <main>
+         <!-- Top Bar -->
+        <div class="topbar">
+            <router-link style="text-decoration: none;" to="/booking-history" class="topbar-link">Booking History</router-link>
+            <router-link style="text-decoration: none;" to="/fnb" class="topbar-link">F&B</router-link>
+            <router-link style="text-decoration: none;" to="/profile" class="topbar-link">Profile</router-link>
+        </div>
+
         <h1 class="title">Top Movies</h1>
         <div v-if="OnlineMovies.length" class="movie-container">
             <div v-for="movie in OnlineMovies" :key="movie.id" class="movie-card">
