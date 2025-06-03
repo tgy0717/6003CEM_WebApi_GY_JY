@@ -39,25 +39,48 @@
     </div>
 </template>
 
-<!-- <script>
-    import { ref, } from "vue";
-    import {useRouter} from "vue-router";
-    import axios from "axios";
+<script>
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import axios from "axios";
 
-    export default {
-        setup() {
-            const username = ref("");
-            const password = ref("");
-            const router = useRouter();
+export default {
+    setup() {
+        const email = ref("");
+        const password = ref("");
+        const router = useRouter();
 
-            const handleLogin = async () => {
-                try{
+        const handleLogin = async () => {
+            try {
+                const response = await axios.post("http://localhost:5000/api/login", {
+                    email: email.value,
+                    password: password.value,
+                });
 
-                }
+                alert(response.data.message); // notify success
+
+                // Store user in localStorage
+                localStorage.setItem("user", JSON.stringify(response.data.user));
+
+                router.push("/home"); // Redirect to homepage or dashboard
+            } catch (error) {
+                alert(error.response?.data?.message || "Login failed");
             }
-        }
+        };
+
+        const handleGoogleLogin = () => {
+            alert("Google login not implemented.");
+        };
+
+        return {
+            email,
+            password,
+            handleLogin,
+            handleGoogleLogin
+        };
     }
-</script> -->
+};
+</script>
 
 <style>
     .forgot-password-container{
