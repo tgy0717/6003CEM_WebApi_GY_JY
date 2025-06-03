@@ -15,7 +15,12 @@
                         <p class="movie-info"><strong>Rating:</strong> {{ movie.rating }}</p>
                         <p class="movie-info"><strong>Duration:</strong> {{ movie.duration }}</p> 
                         <p class="movie-info"><strong>Score:</strong> {{ movie.score }}</p>
-                        <a :href="movie.url" target="_blank" class="view-more">View More</a>
+                        <router-link 
+                            :to="{ name: 'details', params: { mal_id: movie.mal_id } }" 
+                            class="view-more"
+                            >
+                            View More
+                        </router-link>
                     </div>
                 </div>
                 <h2 class="movie-title text-center" style="font-size: 16px;">{{ movie.title }}</h2>
