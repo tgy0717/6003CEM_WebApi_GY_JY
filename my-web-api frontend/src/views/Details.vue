@@ -91,6 +91,7 @@ export default {
 
 .details {
   flex: 1;
+  text-align: justify;
 }
 
 .details h1 {
