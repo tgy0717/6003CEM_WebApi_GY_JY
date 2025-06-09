@@ -1,0 +1,71 @@
+.fnb-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+  padding-left: 40px;
+  padding-right: 40px;
+  margin-bottom: 50px;
+}
+
+.fnb-card { 
+  width: 100%;
+  max-width: 300px;
+  background-color: #222; 
+  border-radius: 20px;
+  overflow: hidden;
+  text-align: left;
+}
+
+.fnb-image {
+  /* width: 100%; */
+  height: 400px; 
+  position: relative;
+  padding: 50px;
+  background-color: white;
+  display: block;
+  margin: auto;
+}
+
+.fnb-name, .fnb-price {
+  padding-left: 10px;
+  font-weight: bold;
+  font-size: 16px;
+  color: white;
+}
+
+.fnb-bottom {
+  display: flex;
+  justify-content: space-between; 
+  align-items: center;
+  padding: 10px 10px 20px 0;
+  background-color: #222;
+}
+
+.quantity-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quantity-control button {
+  background-color: #555;
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s ease;
+}
+
+.quantity-control button:hover {
+  background-color: #777;
+}
+
+.quantity-control span {
+  min-width: 20px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+}

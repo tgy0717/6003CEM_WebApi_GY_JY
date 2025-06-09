@@ -38,6 +38,16 @@
       <p><strong>Cast:</strong> {{ movie.cast || 'Unknown' }}</p>
       <p><strong>Synopsis:</strong> {{ movie.synopsis || movie.background || 'No synopsis available.' }}</p>
     </div>
+
+
+    <div class="button-container">
+      <router-link 
+        :to="{ name: 'payment', params: { mal_id: movie.mal_id } }"
+        class="btn"
+      >
+        Book
+      </router-link>
+    </div>
   </div>
   <p v-else>Loading movie...</p>
 </template>
@@ -64,6 +74,9 @@ export default {
         .catch(error => {
           console.error('Failed to fetch movie details:', error);
         });
+    },
+    goToPayment() {
+      this.$router.push({ name: 'payment', query: { mal_id: this.mal_id } });
     }
   },
 }
@@ -129,5 +142,27 @@ export default {
   left: 0;
   width: 100%;
   height: 100%;
+}
+
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn {
+  background-color: #ffb300;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: bold;
+  display: inline-block;
+  transition: background-color 0.2s ease;
+}
+
+.btn:hover {
+  background-color: #e39f00;
 }
 </style>
