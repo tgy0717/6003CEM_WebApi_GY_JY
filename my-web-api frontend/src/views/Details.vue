@@ -5,14 +5,12 @@
       <div class="poster">
         <img :src="movie.images?.jpg?.image_url" alt="Movie Poster" />
         
-
         <ul class="meta">
-          <li>📅 Release Date: {{ movie.aired?.from?.substring(0, 10) || 'N/A' }}</li>
-          <li>⏱️ Running Time: {{ movie.duration || 'N/A' }}</li>
-          <li>🎬 Genre: {{ movie.genres?.map(g => g.name).join(', ') }}</li>
-          <li>🗣️ Spoken Language: ENG</li>
-          <li>🈯 Subtitles: BM / CHI</li>
-          <li>🔞 Classification: {{ movie.rating || 'N/A'}}</li>
+          <li><span class="meta-title">📅 Release Date:</span> <span class="meta-value">{{ movie.aired?.from?.substring(0, 10) || 'N/A' }}</span></li>
+          <li><span class="meta-title">⏱️ Running Time:</span> <span class="meta-value">{{ movie.duration || 'N/A' }}</span></li>
+          <li><span class="meta-title">🎬 Genre:</span> <span class="meta-value">{{ movie.genres?.map(g => g.name).join(', ') }}</span></li>
+          <!-- <li><span class="meta-title">🗣️ Spoken Language:</span> <span class="meta-value">{{ movie.spokenLanguages?.join(', ') || 'N/A' }}</span></li> -->
+          <li><span class="meta-title">🔞 Classification:</span> <span class="meta-value">{{ movie.rating || 'N/A' }}</span></li>
         </ul>
       </div>
 
@@ -60,6 +58,7 @@ export default {
       axios.get(`https://api.jikan.moe/v4/anime/${this.mal_id}`)
         .then(response => {
           this.movie = response.data.data;
+          console.log(this.movie)
         })
         .catch(error => {
           console.error('Failed to fetch movie details:', error);
@@ -70,64 +69,4 @@ export default {
 </script>
 
 <style scoped>
-.movie-detail-container {
-  color: white;
-  padding: 2rem;
-  max-width: 1500px;
-  margin: auto;
-}
-
-.movie-info {
-  display: flex;
-  gap: 2rem;
-  flex-wrap: wrap;
-}
-
-.poster img {
-  width: 300px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-}
-
-.details {
-  flex: 1;
-  text-align: justify;
-}
-
-.details h1 {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-}
-
-.meta {
-  list-style: none;
-  padding: 0;
-  margin: 1rem 0;
-  font-size: 16px
-}
-
-.meta li {
-  margin-bottom: 0.5rem;
-}
-
-.trailer {
-  flex: 1;
-  height: 400;
-}
-
-.trailer-wrapper {
-  position: relative;
-  padding-bottom: 52%;
-  height: 0;
-  overflow: hidden;
-  margin-top: 1rem;
-}
-
-.trailer-wrapper iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
 </style>
