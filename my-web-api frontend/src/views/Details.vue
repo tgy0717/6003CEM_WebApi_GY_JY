@@ -5,14 +5,12 @@
       <div class="poster">
         <img :src="movie.images?.jpg?.image_url" alt="Movie Poster" />
         
-
         <ul class="meta">
-          <li>📅 Release Date: {{ movie.aired?.from?.substring(0, 10) || 'N/A' }}</li>
-          <li>⏱️ Running Time: {{ movie.duration || 'N/A' }}</li>
-          <li>🎬 Genre: {{ movie.genres?.map(g => g.name).join(', ') }}</li>
-          <li>🗣️ Spoken Language: ENG</li>
-          <li>🈯 Subtitles: BM / CHI</li>
-          <li>🔞 Classification: {{ movie.rating || 'N/A'}}</li>
+          <li><span class="meta-title">📅 Release Date:</span> <span class="meta-value">{{ movie.aired?.from?.substring(0, 10) || 'N/A' }}</span></li>
+          <li><span class="meta-title">⏱️ Running Time:</span> <span class="meta-value">{{ movie.duration || 'N/A' }}</span></li>
+          <li><span class="meta-title">🎬 Genre:</span> <span class="meta-value">{{ movie.genres?.map(g => g.name).join(', ') }}</span></li>
+          <!-- <li><span class="meta-title">🗣️ Spoken Language:</span> <span class="meta-value">{{ movie.spokenLanguages?.join(', ') || 'N/A' }}</span></li> -->
+          <li><span class="meta-title">🔞 Classification:</span> <span class="meta-value">{{ movie.rating || 'N/A' }}</span></li>
         </ul>
       </div>
 
@@ -45,7 +43,7 @@
         :to="{ name: 'payment', params: { mal_id: movie.mal_id } }"
         class="btn"
       >
-        Book
+        Buy Tickets
       </router-link>
     </div>
   </div>
@@ -70,6 +68,7 @@ export default {
       axios.get(`https://api.jikan.moe/v4/anime/${this.mal_id}`)
         .then(response => {
           this.movie = response.data.data;
+          console.log(this.movie)
         })
         .catch(error => {
           console.error('Failed to fetch movie details:', error);

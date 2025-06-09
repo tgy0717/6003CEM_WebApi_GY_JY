@@ -93,8 +93,11 @@
   margin-top: 5px;
   color: lightblue;
   text-decoration: none;
-  font-size: 14px;
+  font-size: 17px;
   padding: 5px;
+  text-align: center;
+  font-weight: bold;
+  color: #ffcc00;
 }
 
 .view-more:hover {
@@ -135,10 +138,24 @@ a:hover {
   
 .topbar {
   display: flex;
+  background-color: #292929;
+  justify-content: space-between;
+}
+
+.topbar-left{
+  display: flex;
+  justify-content: flex-start;
+  gap: 60px;
+  padding: 10px 50px;
+  top: 0;
+  z-index: 1000;
+}
+
+.topbar-right{
+  display: flex;
   justify-content: flex-end;
   gap: 60px;
   padding: 10px 50px;
-  background-color: #292929;
   top: 0;
   z-index: 1000;
 }
@@ -168,3 +185,121 @@ a:hover {
   width: 100%;
 }
 
+.profile-dropdown {
+  position: relative;
+  display: inline-block;
+  font-weight: bold;
+  font-size: 17px;
+}
+
+.dropdown-menu {
+  white-space: nowrap;
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background-color: #333;
+  border-radius: 8px;
+  z-index: 100;
+}
+
+.profile-dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+.dropdown-menu button {
+  background: none;
+  background-color: #cca300;
+  border: none;
+  color: white;
+  width: 100%;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.dropdown-menu button:hover {
+  color: red;
+  border-radius: 8px;
+  background-color: #444;
+  text-decoration: underline;
+}
+
+.movie-detail-container {
+  color: white;
+  padding: 2rem;
+  max-width: 1500px;
+  margin: auto;
+}
+
+.movie-info {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.poster img {
+  width: 300px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+.details {
+  flex: 1;
+  text-align: justify;
+}
+
+.details h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.meta {
+  font-size: 14.5px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.meta li {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.meta-title {
+  font-weight: bold;
+}
+
+.meta-value {
+  color: yellow;
+  text-align: right;
+}
+
+
+.trailer {
+  flex: 1;
+  height: 400;
+}
+
+.trailer-wrapper {
+  position: relative;
+  padding-bottom: 52%;
+  height: 0;
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+.trailer-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.active-link{
+  color: #ffcc00;
+}
