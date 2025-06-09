@@ -8,6 +8,6 @@ rating : String,
 title : String
 });
 
-const Movie = mongoose.model("Movie", MovieSchema, "Movie"); // Explicitly set the collection name
+const Movie = mongoose.model("movie", MovieSchema, "movie"); // Explicitly set the collection name
 
 module.exports = Movie; 
