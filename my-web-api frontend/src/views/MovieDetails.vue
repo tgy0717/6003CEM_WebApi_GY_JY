@@ -38,6 +38,15 @@
       <p><strong>Cast:</strong> {{ movie.cast || 'Unknown' }}</p> -->
       <p><strong>Synopsis:</strong> {{ movie.description || 'No synopsis available.' }}</p>
     </div>
+
+    <div class="button-container">
+      <router-link 
+        :to="{ name: 'payment', query: { id: movie.id } }"
+        class="btn"
+      >
+        Buy Tickets
+      </router-link>
+    </div>
   </div>
   <p v-else>Loading movie...</p>
 </template>

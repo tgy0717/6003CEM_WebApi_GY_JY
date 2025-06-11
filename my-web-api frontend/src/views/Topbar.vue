@@ -21,13 +21,15 @@
 </template>
 
 <script>
-    export default {
+export default {
     methods: {
         signOut() {
-        // Add your logout logic here
+        localStorage.clear();
+
+        // sessionStorage.clear();
         console.log("Signing out...");
-        // Example: this.$router.push('/login');
+        this.$router.push('/');
         }
     }
-    }
+}
 </script>

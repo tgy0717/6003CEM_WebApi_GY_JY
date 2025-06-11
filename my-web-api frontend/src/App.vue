@@ -6,10 +6,23 @@ import Topbar from './views/Topbar.vue'
 
 <template>
   <div id="app">
-    <Topbar />
+    <Topbar v-if="!isRootRoute" />
     <router-view />
   </div>
 </template>
+
+<script>
+export default {
+  components: {
+    Topbar
+  },
+  computed: {
+    isRootRoute() {
+      return this.$route.path === '/';
+    }
+  }
+};
+</script>
 
 <style scoped>
 header {
