@@ -4,10 +4,11 @@ import RegistrationPage from '../views/RegistrationView.vue';
 import HomePage from '../views/HomeView.vue';
 import AboutPage from '../views/AboutView.vue';
 import MoviePage from '../views/MoviePage.vue';
-import FoodBeveragePage from '../views/FoodBeverage.vue';
 import ProfilePage from '../views/Profile.vue';
 import PaymentPage from '../views/PaymentPage.vue'
 import PaymentSuccessPage from '../views/PaymentSuccess.vue';
+import BookingHistoryPage from "@/views/BookingHistory.vue";
+import ForgetPasswordPage from "@/views/ForgetPassword.vue";
 
 
 const router = createRouter({
@@ -25,13 +26,12 @@ const router = createRouter({
       path: '/desserts',
       name: 'Desserts',
       component: () => import('@/views/Dessert.vue')
-}
-
-
-      // {  path: '/fnb', name: "fnb", component: FoodBeveragePage},
+},
       {  path: '/profile', name: "profile", component: ProfilePage},
       {  path: '/payment/:mal_id', name: "payment", component: PaymentPage, props: true},
       {  path: '/paymentSuccess', name: "success", component: PaymentSuccessPage},
+      {  path: '/booking-history', name: "bookingHistory", component: BookingHistoryPage},
+      {  path: '/forgot-password', name: "forgetPassword", component: ForgetPasswordPage},
    ],
 });
 

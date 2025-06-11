@@ -32,14 +32,14 @@
       <!-- Right: Movie Details -->
       <div class="details-section">
         <div class="top-row">
-          <div class="movie-info">
+          <div class="ticket-info">
             <h2>{{ movie.title }}</h2>
             <p><span class="label">Duration: {{ movie.duration }}</span></p>
             <p><span class="label">Cinema: {{ cinema }}</span></p>
             <p><span class="label">Date: {{ formattedDate }}</span></p>
             <p><span class="label">Ticket(s): Normal x{{ quantity }}</span></p>
           </div>
-        <div class="price">
+          <div class="price">
             <p>RM {{ totalPrice.toFixed(2) }}</p>
           </div>
         </div>
@@ -99,47 +99,7 @@ export default {
       this.user = JSON.parse(storedUser);
     }
 
-    // this.fetchMovieDetails();
     this.initializeStripe();
-
-    // // ✅ Use this.$route instead of useRoute()
-    // const success = this.$route.query.success;
-    // const canceled = this.$route.query.canceled;
-
-    // console.log('Route query:', this.$route.query);
-
-    // if (success === 'true') {
-    //     alert('Payment successful!');
-
-    //     const bookingData = {
-    //     movieId: this.mal_id,
-    //     userId: this.user.id,
-    //     cinema: this.cinema,
-    //     bookingDate: this.date,
-    //     quantity: this.quantity,
-    //     price: this.price,
-    //     };
-
-    //     fetch('http://localhost:5000/api/save-booking', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify(bookingData),
-    //     })
-    //     .then(res => res.json())
-    //     .then(data => {
-    //         console.log('Booking saved:', data);
-    //         setTimeout(() => {
-    //         this.$router.push('/paymentSuccess');
-    //         }, 2000);
-    //     })
-    //     .catch(err => {
-    //         console.error('Failed to save booking:', err);
-    //     });
-    // }
-
-    // if (canceled === 'true') {
-    //     alert('Payment canceled.');
-    // }
   },
   methods: {
     async initializeStripe() {
@@ -275,7 +235,7 @@ export default {
   white-space: nowrap; 
 }
 
-.movie-info > *:not(:last-child) {
+.ticket-info > *:not(:last-child) {
   margin-bottom: 10px;
 }
 
