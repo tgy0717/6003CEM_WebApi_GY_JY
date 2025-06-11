@@ -4,10 +4,11 @@ import RegistrationPage from '../views/RegistrationView.vue';
 import HomePage from '../views/HomeView.vue';
 import AboutPage from '../views/AboutView.vue';
 import MoviePage from '../views/MoviePage.vue';
-import FoodBeveragePage from '../views/FoodBeverage.vue';
 import ProfilePage from '../views/Profile.vue';
 import PaymentPage from '../views/PaymentPage.vue'
 import PaymentSuccessPage from '../views/PaymentSuccess.vue';
+import BookingHistoryPage from "@/views/BookingHistory.vue";
+import ForgetPasswordPage from "@/views/ForgetPassword.vue";
 
 
 const router = createRouter({
@@ -22,11 +23,17 @@ const router = createRouter({
       {  path: "/movie", name: "movie", component: MoviePage},
       {  path: "/movie-details/:id", name: "movie-details", component: () => import("../views/MovieDetails.vue"), props: true  },
 
-      // {  path: '/fnb', name: "fnb", component: FoodBeveragePage},
+      {
+      path: '/desserts',
+      name: 'Desserts',
+      component: () => import('@/views/Dessert.vue')
+      },
       {  path: '/profile', name: "profile", component: ProfilePage},
       { path: '/payment', name: 'payment', component: PaymentPage, props: route => ({ mal_id: route.query.mal_id, id: route.query.id }) }
 ,
       {  path: '/paymentSuccess', name: "success", component: PaymentSuccessPage},
+      {  path: '/booking-history', name: "bookingHistory", component: BookingHistoryPage},
+      {  path: '/forgot-password', name: "forgetPassword", component: ForgetPasswordPage},
    ],
 });
 

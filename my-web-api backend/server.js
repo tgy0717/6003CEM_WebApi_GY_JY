@@ -3,6 +3,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
+
 const Movie = require("./Model/Movie");
 const User = require("./Model/User");
 const Booking = require("./Model/Booking");
@@ -22,6 +24,9 @@ mongoose.connect(process.env.MONGO_URI, {
 })
 .then(() => console.log("MongoDB Connected"))
 .catch(err => console.log(err));
+
+// Arrays that used to store verification code
+const verification_codes = {}
 
 // Payment API
 app.post('/api/create-checkout-session', async (req, res) => {
@@ -66,6 +71,125 @@ app.get("/api/movie", async (req, res) => {
         }
 });
 
+function generateVerificationCode() {
+    return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit
+}
+
+function storeVerificationCode(email, code) {
+    verification_codes[email] = code;
+}
+
+function verifyStoredCode(email, userCode) {
+    return verification_codes[email] === userCode;
+}
+
+// Send Verification Email
+async function sendVerificationEmail(receiverEmail, receiverName) {
+    const code = generateVerificationCode();
+    storeVerificationCode(receiverEmail, code);
+
+    const transporter = nodemailer.createTransport({
+        // service: "gmail",
+        // auth: {
+        //     user: process.env.SENDER_EMAIL,
+        //     pass: process.env.SMTP_PASSWORD,
+        // },
+        host: "smtp.gmail.com",
+        port: 587, // Use TLS
+        secure: false, // TLS requires this to be false
+        auth: {
+            user: process.env.SENDER_EMAIL,
+            pass: process.env.SMTP_PASSWORD, // Must be an App Password if using 2FA
+        },
+    });
+
+    const mailOptions = {
+        from: `"Cinema App" <${process.env.SENDER_EMAIL}>`,
+        to: receiverEmail,
+        subject: "Cinema App - Password Reset Code",
+        html: `
+            <p>Hi ${receiverName},</p>
+            <p>Your password reset code is: <strong>${code}</strong></p>
+            <p>If you did not request this, please ignore this email.</p>
+        `,
+    };
+
+    await transporter.sendMail(mailOptions);
+}
+
+// Forget password (Enter email)
+app.post('/api/forgot-password', async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) return res.status(400).json({ message: "Email is required." });
+
+    try {
+        const user = await User.findOne({ email });
+
+        if (!user) return res.status(404).json({ message: "Email not found." });
+
+        await sendVerificationEmail(user.email, user.username || user.email.split('@')[0]);
+
+        return res.status(200).json({ message: "Verification email sent successfully." });
+    } catch (error) {
+        console.error("Forgot Password Error:", error);
+        return res.status(500).json({ message: "Internal server error." });
+    }
+});
+
+// Verify Code
+app.post('/api/verify-code', async (req, res) => {
+    const { email, code } = req.body;
+
+    if (!code) return res.status(400).json({ message: "Verification code is required." });
+
+    const storedCode = verification_codes[email];
+    if (!storedCode) {
+        return res.status(400).json({ message: "No verification code found. Please request a new one." });
+    }
+
+    if (!verifyStoredCode(email, code)) {
+        return res.status(400).json({ message: "Invalid verification code." });
+    }
+
+    // Remove code after successful verification
+    delete verification_codes[email];
+
+    res.status(200).json({ message: "Verification successful. You may reset your password now." });
+});
+
+app.post('/api/reset-password', async (req, res) => {
+    const { email, new_password, confirm_password } = req.body;
+
+    if (!new_password || !confirm_password) {
+        return res.status(400).json({ message: "New and confirm password are required." });
+    }
+
+    if (new_password !== confirm_password) {
+        return res.status(400).json({ message: "Passwords do not match." });
+    }
+
+    try {
+        const hashedPassword = await bcrypt.hash(new_password, 10);
+
+        const user = await User.findOneAndUpdate(
+            { email },
+            { password: hashedPassword },
+            { new: true }
+        );
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        return res.status(200).json({ message: "Password changed successfully." });
+    } catch (error) {
+        console.error("Reset Password Error:", error);
+        return res.status(500).json({ message: "Internal server error." });
+    }
+});
+
+
 // Login
 app.post("/api/login", async (req, res) => {
         const { email, password } = req.body;
@@ -108,43 +232,6 @@ app.post("/api/register", async(req, res) => {
 });
 
 // Save Booking
-// app.post('/api/verify-and-save-booking', async (req, res) => {
-//   const { sessionId } = req.body;
-//   try {
-//     // 1. Retrieve Stripe session
-//     const session = await stripe_key.checkout.sessions.retrieve(sessionId);
-
-//     // 2. Validate payment status
-//     if(session.payment_status !== 'paid') {
-//         return res.status(400).json({ error: 'Payment not completed'});
-//     }
-
-//     // 3. Extract metadata from the session
-//     const { movieId, userId, cinema, bookingDate, quantity} = session.line_items.data[0].price_data.product_data.metadata;
-
-//     // 4. Create and save booking
-//     const newBooking = new Booking({
-//       movieId,
-//       userId,
-//       cinema,
-//       bookingDate,
-//       quantity,
-//       total: session.amount_total / 100,
-//       paymentStatus: 'paid',
-//       sessionId: sessionId,
-//       bookingCreatedTime: new Date(),
-//     });
-
-//     const savedBooking = await newBooking.save();
-
-//     res.status(201).json({ message: 'Booking saved successfully', booking: savedBooking });
-//   } catch (error) {
-//     console.error('Error saving booking:', error);
-//     print("Error:", error);
-//     res.status(500).json({ message: 'Server error saving booking' });
-//   }
-// });
-
 app.post('/api/verify-and-save-booking', async (req, res) => {
   const { sessionId } = req.body;
 
@@ -259,7 +346,26 @@ app.put("/api/users/:id/password", async (req, res) => {
   }
 });
 
+// Get booking
+app.get('/api/get-booking', async (req, res) => {
+  const { userId } = req.query;
 
+  console.log("User ID:", userId);
 
+  try {
+    if(!userId) {
+      return res.status(400).json({message: "Missing user ID parameter."});
+    }
+
+    const bookings = await Booking.find({ userId }).sort({ createdAt: -1 });
+
+    console.log("Bookings:", bookings);
+
+    res.status(200).json(bookings);
+  } catch(error) {
+    res.status(500).json({message: "Failed to retrieve bookings", error: error.message});
+  }
+
+});
 
 
