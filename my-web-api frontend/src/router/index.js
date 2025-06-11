@@ -22,13 +22,15 @@ const router = createRouter({
       {  path: "/details/:mal_id", name: "details", component: () => import("../views/Details.vue"), props: true  },
       {  path: "/movie", name: "movie", component: MoviePage},
       {  path: "/movie-details/:id", name: "movie-details", component: () => import("../views/MovieDetails.vue"), props: true  },
+
       {
       path: '/desserts',
       name: 'Desserts',
       component: () => import('@/views/Dessert.vue')
-},
+      },
       {  path: '/profile', name: "profile", component: ProfilePage},
-      {  path: '/payment/:mal_id', name: "payment", component: PaymentPage, props: true},
+      { path: '/payment', name: 'payment', component: PaymentPage, props: route => ({ mal_id: route.query.mal_id, id: route.query.id }) }
+,
       {  path: '/paymentSuccess', name: "success", component: PaymentSuccessPage},
       {  path: '/booking-history', name: "bookingHistory", component: BookingHistoryPage},
       {  path: '/forgot-password', name: "forgetPassword", component: ForgetPasswordPage},

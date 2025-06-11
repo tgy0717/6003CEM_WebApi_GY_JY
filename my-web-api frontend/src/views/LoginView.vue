@@ -62,7 +62,7 @@ export default {
                 // Store user in localStorage
                 localStorage.setItem("user", JSON.stringify(response.data.user));
 
-                router.push("/home"); // Redirect to homepage or dashboard
+                router.push("/movie"); // Redirect to homepage or dashboard
             } catch (error) {
                 alert(error.response?.data?.message || "Login failed");
             }

@@ -26,15 +26,16 @@
     <div class="movie-container">
       <!-- Left: Movie Image -->
       <div class="image-section">
-        <img :src="movie.images?.jpg?.image_url" alt="Movie Poster" />
+        <img :src="movie.images?.jpg?.image_url || movie.primaryImage" alt="Movie Poster" />
       </div>
 
       <!-- Right: Movie Details -->
       <div class="details-section">
         <div class="top-row">
           <div class="ticket-info">
-            <h2>{{ movie.title }}</h2>
-            <p><span class="label">Duration: {{ movie.duration }}</span></p>
+            <h2>{{ movie.title || movie.primaryTitle }}</h2>
+            <p><span class="label">Duration: {{ movie.duration || movie.runtimeMinutes + " Minutes" }}</span></p>
+
             <p><span class="label">Cinema: {{ cinema }}</span></p>
             <p><span class="label">Date: {{ formattedDate }}</span></p>
             <p><span class="label">Ticket(s): Normal x{{ quantity }}</span></p>
@@ -69,7 +70,7 @@ import axios from 'axios';
 import { loadStripe } from '@stripe/stripe-js';
 
 export default {
-  props: ['mal_id'],
+  props: ['mal_id', 'id'],
   data() {
     return {
       movie: null,
@@ -112,19 +113,49 @@ export default {
     },
     fetchMovieDetails() {
       this.loading = true;
-      axios.get(`https://api.jikan.moe/v4/anime/${this.mal_id}`).then(response => {
-        this.movie = response.data.data;
-      }).catch(error => {
-        console.error('Failed to fetch movie details:', error);
-      }).finally(() => {
-        this.loading = false;
-      });
+
+      if (this.mal_id) {
+        // Jikan API
+        axios.get(`https://api.jikan.moe/v4/anime/${this.mal_id}`)
+          .then(response => {
+            this.movie = response.data.data;
+          })
+          .catch(error => {
+            console.error('Failed to fetch Jikan movie:', error);
+          })
+          .finally(() => {
+            this.loading = false;
+          });
+
+      } else if (this.id) {
+        const options = {
+          method: 'GET',
+          url: 'https://imdb236.p.rapidapi.com/api/imdb/top250-movies',
+          headers: {
+            'x-rapidapi-key': '1871f1b3bdmsh9d033733ff8cbf5p118b1djsn1abe42bc11b9',
+            'x-rapidapi-host': 'imdb236.p.rapidapi.com'
+          }
+        };
+
+        axios.request(options)
+          .then(response => {
+            const shows = response.data;
+            this.movie = shows.find(show => show.id === this.id);
+            console.log(this.movie);
+          })
+          .catch(error => {
+            console.error('Error fetching TV shows:', error);
+          });
+      }
+
+      
+      this.loading = false;
     },
     async pay() {
       try {
         const response = await axios.post('http://localhost:5000/api/create-checkout-session', {
-          movieId: this.mal_id,
-          movieTitle: this.movie.title,
+          movieId: this.mal_id || this.id,
+          movieTitle: this.movie.title || this.movie.primaryTitle,
           price: this.totalPrice,
           userId: this.user.id,
           quantity: this.quantity,

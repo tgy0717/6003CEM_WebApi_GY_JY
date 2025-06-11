@@ -304,6 +304,48 @@ app.post('/api/verify-and-save-booking', async (req, res) => {
   }
 });
 
+app.put("/api/users/:id", async (req, res) => {
+  
+  console.log("Received profile update:", req.body);
+  const { username, email } = req.body;
+
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { username, email },
+      { new: true }
+    );
+    if (!user) return res.status(404).json({ message: "User not found." });
+    console.log(user)
+    res.json({ message: "Profile updated successfully!", user: { id: user._id, username: user.username, email: user.email } });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+app.put("/api/users/:id/password", async (req, res) => {
+  const { oldPassword, newPassword, confirmPassword } = req.body;
+
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found." });
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) return res.status(400).json({ message: "Old password is incorrect." });
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ message: "Passwords do not match." });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    res.json({ message: "Password changed successfully!" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // Get booking
 app.get('/api/get-booking', async (req, res) => {
   const { userId } = req.query;
