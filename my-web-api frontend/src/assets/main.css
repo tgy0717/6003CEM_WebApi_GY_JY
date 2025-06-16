@@ -9,11 +9,12 @@
 
 .movie-container{
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 25px;
   justify-content: center;
   padding-left: 40px;
   padding-right: 40px;
+  padding-bottom: 40px;
 }
 
 .movie-grid {
@@ -247,6 +248,7 @@ a:hover {
 }
 
 .details {
+  padding-top: 20px;
   flex: 1;
   text-align: justify;
 }
@@ -305,6 +307,7 @@ a:hover {
 }
 
 .button-container {
+  gap: 15px;
   display: flex;
   justify-content: flex-end;
 }
@@ -320,4 +323,21 @@ a:hover {
   font-weight: bold;
   display: inline-block;
   transition: background-color 0.2s ease;
+}
+
+.btn-add{
+  background-color: #525252;
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: bold;
+  display: inline-block;
+  transition: background-color 0.2s ease;
+}
+
+.btn-added{
+  color: #ffb300;
 }

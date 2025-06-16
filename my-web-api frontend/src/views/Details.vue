@@ -31,14 +31,14 @@
   
     <!-- Details -->
     <div class="details">
-
-      <p><strong>Director:</strong> {{ movie.director || 'Unknown' }}</p>
-      <p><strong>Cast:</strong> {{ movie.cast || 'Unknown' }}</p>
       <p><strong>Synopsis:</strong> {{ movie.synopsis || movie.background || 'No synopsis available.' }}</p>
     </div>
 
 
     <div class="button-container">
+      
+      <a @click="toggleFavorite()" :class="['btn-add', { 'btn-added': isFavorite }]">
+      {{ isFavorite ? 'Added to Favorites ✓' : 'Add to Favorites ❤️'}}</a>
       <router-link 
         :to="{ name: 'payment', query: { mal_id: movie.mal_id } }"
         class="btn"
@@ -58,10 +58,27 @@ export default {
   data() {
     return {
       movie: null,
+      isFavorite: false,
     };
   },
-  mounted() {
+  async mounted() {
     this.fetchMovieDetails();
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      this.user = JSON.parse(storedUser);
+    }
+    const movieId = this.mal_id || this.id;
+    try {
+      const res = await axios.get('http://localhost:5000/api/is-favorite', {
+        params: {
+          userId: this.user.id,
+          movieId: movieId,
+        }
+      });
+      this.isFavorite = res.data.isFavorite;
+    } catch (err) {
+      console.error('Failed to check favorite status:', err);
+    }
   },
   methods: {
     fetchMovieDetails() {
@@ -76,6 +93,22 @@ export default {
     },
     goToPayment() {
       this.$router.push({ name: 'payment', query: { mal_id: this.mal_id } });
+    },
+    async toggleFavorite() {
+      try {
+        const favoriteData = {
+          userId: this.user.id,
+          movieId: this.mal_id || this.id,
+        };
+        console.log(favoriteData)
+        const response = await axios.post('http://localhost:5000/api/toggle-favorite', favoriteData);
+        this.isFavorite = !this.isFavorite;
+
+        alert(response.data.message);
+      } catch (error) {
+        console.error('Failed to toggle favorite:', error);
+        alert('Something went wrong.');
+      }
     }
   },
 }
@@ -146,4 +179,5 @@ export default {
 .btn:hover {
   background-color: #e39f00;
 }
+
 </style>

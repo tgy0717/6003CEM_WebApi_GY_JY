@@ -9,6 +9,7 @@ import PaymentPage from '../views/PaymentPage.vue'
 import PaymentSuccessPage from '../views/PaymentSuccess.vue';
 import BookingHistoryPage from "@/views/BookingHistory.vue";
 import ForgetPasswordPage from "@/views/ForgetPassword.vue";
+import Favorite from "@/views/Favorite.vue";
 
 
 const router = createRouter({
@@ -34,6 +35,7 @@ const router = createRouter({
       {  path: '/paymentSuccess', name: "success", component: PaymentSuccessPage},
       {  path: '/booking-history', name: "bookingHistory", component: BookingHistoryPage},
       {  path: '/forgot-password', name: "forgetPassword", component: ForgetPasswordPage},
+      {  path: '/favorite', name: "favorite", component: Favorite},
    ],
 });
 

@@ -17,9 +17,9 @@
                 <!-- <p class="movie-info"><strong>Description:</strong> {{ show.description || 'N/A' }}</p> -->
                 <p class="movie-info"><strong>Rating:</strong> {{ show.averageRating || 'N/A' }}</p>
                 <p class="movie-info"><strong>Genres:</strong> {{ show.genres?.join(', ') || 'N/A' }}</p>
-                <p class="movie-info"><strong>Languages:</strong> {{ show.spokenLanguages?.join(', ') || 'N/A' }}</p>
-                <p class="movie-info"><strong>Release Date:</strong> {{ show.releaseDate || 'N/A' }}</p>
                 <p class="movie-info"><strong>Duration:</strong> {{ show.runtimeMinutes }} Minutes</p>
+                <p class="movie-info"><strong>Release Date:</strong> {{ show.releaseDate || 'N/A' }}</p>
+                <p class="movie-info"><strong>Languages:</strong> {{ show.spokenLanguages?.join(', ') || 'N/A' }}</p>
 
                 <router-link 
                     :to="{ name: 'movie-details', params: { id: show.id } }" 
@@ -29,6 +29,7 @@
                 </router-link>
             </div>
           </div>
+          <h2 class="movie-title text-center" style="font-size: 16px;">{{ show.primaryTitle }}</h2>
         </div>
       </div>
 

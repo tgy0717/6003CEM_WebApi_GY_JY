@@ -61,38 +61,67 @@ export default {
     },
     methods: {
         async fetchBookings(userId) {
-            try{
+            try {
                 this.loading = true;
 
                 const response = await axios.get('http://localhost:5000/api/get-booking', {
-                    params: {
-                        userId: userId
-                    }
+                params: { userId }
                 });
 
                 const bookings = response.data;
 
-                // For each booking, fetch its movie details and add to booking object
                 for (const booking of bookings) {
-                try {
+                if (booking.movieId && booking.movieId.startsWith('tt')) {
+                    // IMDb logic
+                    const options = {
+                    method: 'GET',
+                    url: 'https://imdb236.p.rapidapi.com/api/imdb/top250-movies',
+                    headers: {
+                        'x-rapidapi-key': '1871f1b3bdmsh9d033733ff8cbf5p118b1djsn1abe42bc11b9',
+                        'x-rapidapi-host': 'imdb236.p.rapidapi.com'
+                    }
+                    };
+
+                    try {
+                    const imdbResponse = await axios.request(options);
+                    const shows = imdbResponse.data;
+                    const matched = shows.find(show => show.id === booking.movieId);
+
+                    if (matched) {
+                        booking.movieTitle = matched.primaryTitle;
+                        booking.movieImage = matched.primaryImage;
+                    } else {
+                        booking.movieTitle = 'Unavailable';
+                        booking.movieImage = '';
+                    }
+                    } catch (error) {
+                    console.error('Error fetching IMDb movie:', error);
+                    booking.movieTitle = 'Unavailable';
+                    booking.movieImage = '';
+                    }
+
+                } else {
+                    // Jikan logic
+                    try {
                     const movieResponse = await axios.get(`https://api.jikan.moe/v4/anime/${booking.movieId}`);
                     booking.movieTitle = movieResponse.data.data.title;
                     booking.movieImage = movieResponse.data.data.images?.jpg?.image_url;
-                } catch (movieError) {
-                    console.error(`Failed to fetch movie for ID ${booking.movieId}`, movieError);
+                    } catch (movieError) {
+                    console.error(`Failed to fetch Jikan movie for ID ${booking.movieId}`, movieError);
                     booking.movieTitle = 'Unavailable';
                     booking.movieImage = '';
+                    }
                 }
                 }
 
                 this.bookings = bookings;
                 console.log("Bookings:", this.bookings);
-            }catch(error){
-                console.error('Failed to fetch booking history: ', error);
-            }finally{
+
+            } catch (error) {
+                console.error('Failed to fetch booking history:', error);
+            } finally {
                 this.loading = false;
             }
-            
         }
     }
 }
