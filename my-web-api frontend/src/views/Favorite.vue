@@ -1,0 +1,122 @@
+<template>
+	<main>
+		<h1 class="title">My Favorites</h1>
+		<div v-if="loading" class="loading">Loading favorites, please wait...</div>
+
+		<div v-else-if="favorites.length" class="movie-container">
+			<div v-for="movie in favorites" :key="movie.movieId" class="movie-card">
+				<div 
+				class="movie-image" 
+				:style="{ backgroundImage: 'url(' + movie.image + ')' }"
+				>
+					<div class="overlay"></div>
+					<div class="movie-details">
+						<h2 class="movie-title">{{ movie.title }}</h2>
+						<p class="movie-info"><strong>Rating:</strong> {{ movie.rating }}</p>
+						<p class="movie-info"><strong>Genres:</strong> {{ movie.genres }}</p>
+						<p class="movie-info"><strong>Duration:</strong> {{ movie.duration }}</p>
+						<p class="movie-info"><strong>Release Date:</strong> {{ movie.releaseDate }}</p>
+						<router-link 
+              			:to="getRouterLink(movie.id)" 
+						class="view-more">
+						View More
+						</router-link>
+					</div>
+				</div>
+				
+                <h2 class="movie-title text-center" style="font-size: 16px;">{{ movie.title }}</h2>	
+			</div>
+		</div>
+		<p v-else class="loading">No favorites found.</p>
+	</main>
+</template>
+
+<script>
+import axios from 'axios';
+
+export default {
+	data() {
+		return {
+		favorites: [],
+		userId: '', // Assume populated from auth/user store
+		loading: true
+		};
+	},
+	async mounted() {
+		const storedUser = localStorage.getItem("user");
+		if (storedUser) {
+			this.user = JSON.parse(storedUser);
+		}
+		try {
+			const response = await axios.get('http://localhost:5000/api/get-favorites', {
+			params: { userId: this.user.id }
+		});
+
+		const favoriteList = response.data;
+		console.log(favoriteList)
+
+		for (const fav of favoriteList) {
+			if (fav.startsWith('tt')) {
+				const options = {
+					method: 'GET',
+					url: 'https://imdb236.p.rapidapi.com/api/imdb/top250-movies',
+					headers: {
+						'x-rapidapi-key': '1871f1b3bdmsh9d033733ff8cbf5p118b1djsn1abe42bc11b9',
+						'x-rapidapi-host': 'imdb236.p.rapidapi.com'
+					}
+				};
+
+				try {
+					const response = await axios.request(options);
+					const shows = response.data;
+					
+					const movie = shows.find(m => m.id === fav);
+					if (movie) {
+					this.favorites.push({
+						id: fav,
+						title: movie.primaryTitle,
+						image: movie.primaryImage,
+						rating: movie.averageRating,
+						genres: movie.genres?.join(', ') || 'N/A',
+						duration: movie.runtimeMinutes + ' Minutes',
+						releaseDate: movie.releaseDate
+					});
+					}
+				} catch (error) {
+					console.error(`Failed to fetch IMDB movie ${fav}:`, error);
+				}
+
+			} else {
+				const jikan = await axios.get(`https://api.jikan.moe/v4/anime/${fav}`);
+				const anime = jikan.data.data;
+
+				this.favorites.push({
+				id: fav,
+				title: anime.title,
+				image: anime.images.jpg.image_url,
+				rating: anime.score,
+				genres: anime.genres.map(g => g.name).join(', '),
+				duration: anime.duration,
+				releaseDate: anime.aired.from?.substring(0, 10)
+				});
+			}
+		}
+		
+		} catch (err) {
+			console.error('Failed to load favorites:', err);
+		}
+
+		
+		setTimeout(() => {
+			this.loading = false;
+		}, 200);
+	},
+	methods: {
+		getRouterLink(movie) {
+			return movie.startsWith('tt')
+			? { name: 'movie-details', params: { id: movie } }
+			: { name: 'details', params: { mal_id: movie } };
+		}
+	}
+};
+</script>
