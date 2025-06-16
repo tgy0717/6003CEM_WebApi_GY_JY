@@ -18,7 +18,9 @@ export default {
   },
   computed: {
     isRootRoute() {
-      return this.$route.path === '/';
+      return ['/', '/forgot-password', '/registration'].includes(this.$route.path);
+
+
     }
   }
 };
