@@ -8,7 +8,7 @@ const nodemailer = require("nodemailer");
 const Movie = require("./Model/Movie");
 const User = require("./Model/User");
 const Booking = require("./Model/Booking");
-
+const Favorite = require("./Model/Favorite");
 // Payment API
 const Stripe = require('stripe');
 const stripe_key = Stripe(process.env.STRIPE_SECRET_KEY);
@@ -368,4 +368,54 @@ app.get('/api/get-booking', async (req, res) => {
 
 });
 
+app.post('/api/toggle-favorite', async (req, res) => {
+  const { userId, movieId } = req.body;
 
+  try {
+    const exists = await Favorite.findOne({ userId, movieId });
+
+    if (exists) {
+      await Favorite.deleteOne({ userId, movieId });
+      return res.status(200).json({ message: 'Favorite removed' });
+    } else {
+      const newFavorite = new Favorite({ userId, movieId });
+      await newFavorite.save();
+      return res.status(201).json({ message: 'Favorite added' });
+    }
+  } catch (err) {
+    console.error('Error toggling favorite:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+app.get('/api/is-favorite', async (req, res) => {
+  const { userId, movieId } = req.query;
+
+  try {
+    const exists = await Favorite.findOne({ userId, movieId });
+    res.json({ isFavorite: !!exists });
+  } catch (err) {
+    console.error('Error checking favorite:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+app.get('/api/get-favorites', async (req, res) => {
+  const { userId } = req.query;
+
+  if (!userId) {
+    return res.status(400).json({ message: 'Missing userId' });
+  }
+
+  try {
+    const favorites = await Favorite.find({ userId });
+
+    // Return just the movieId list
+    const result = favorites.map(fav => fav.movieId);
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error('Error fetching favorites:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
