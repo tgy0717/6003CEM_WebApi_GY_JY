@@ -28,7 +28,6 @@
                 <h2 class="movie-title text-center" style="font-size: 16px;">{{ movie.title }}</h2>
             </div>
         </div>
-        <p v-else class="loading">Loading movies...</p>
     </main>
 </template>
 
@@ -38,6 +37,8 @@ import TheWelcome from '../components/TheWelcome.vue'
 import { createApp } from 'vue' 
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+import { useLoading } from '@/composables/useLoading'
+const { showLoading, hideLoading } = useLoading()
 
 export default {
     components: {  
@@ -65,6 +66,7 @@ export default {
     },
     methods:{
         getOnlineApiMovie (){
+            showLoading()
             axios.get('https://api.jikan.moe/v4/top/anime?type=movie')
             .then(response => {
                 console.log(response.data)
@@ -89,6 +91,7 @@ export default {
             .catch(error => {
                 console.error('Error fetching data:', error);
             });
+            hideLoading()
         },
 
     }

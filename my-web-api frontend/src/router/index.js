@@ -16,10 +16,10 @@ const router = createRouter({
    history: createWebHistory(import.meta.env.BASE_URL),
    routes: [
 
-      {  path: "/", name: "login", component: LoginPage},
+      {  path: "/", name: "login", component: LoginPage, meta: { public: true }},
       {  path: "/home", name: "home", component: Homepage},
       {  path: "/anime-movie", name: "anime-movie", component: AnimeMoviePage},
-      {  path: "/registration", name: "registration", component: RegistrationPage},
+      {  path: "/registration", name: "registration", component: RegistrationPage, meta: { public: true }},
       {  path: "/details/:mal_id", name: "details", component: () => import("../views/Details.vue"), props: true  },
       {  path: "/movie", name: "movie", component: MoviePage},
       {  path: "/movie-details/:id", name: "movie-details", component: () => import("../views/MovieDetails.vue"), props: true  },
@@ -29,9 +29,21 @@ const router = createRouter({
 ,
       {  path: '/paymentSuccess', name: "success", component: PaymentSuccessPage},
       {  path: '/booking-history', name: "bookingHistory", component: BookingHistoryPage},
-      {  path: '/forgot-password', name: "forgetPassword", component: ForgetPasswordPage},
+      {  path: '/forgot-password', name: "forgetPassword", component: ForgetPasswordPage, meta: { public: true }},
       {  path: '/favorite', name: "favorite", component: Favorite},
    ],
 });
 
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('user');
+
+  if (to.meta.public || token) {
+    next();
+  } else {
+    next({ name: 'login' });
+  }
+});
+
 export default router;
+
+

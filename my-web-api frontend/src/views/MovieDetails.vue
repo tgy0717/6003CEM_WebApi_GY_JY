@@ -50,11 +50,13 @@
 		</router-link>
 		</div>
 	</div>
-	<p v-else>Loading movie...</p>
 </template>
 
 <script>
 import axios from 'axios';
+
+import { useLoading } from '@/composables/useLoading'
+const { showLoading, hideLoading } = useLoading()
 
 export default {
 	props: ['id'],
@@ -73,7 +75,7 @@ export default {
 		};
 	},
 	async mounted() { 
-		
+		showLoading()
 		const storedUser = localStorage.getItem("user");
 		if (storedUser) {
 			this.user = JSON.parse(storedUser);
@@ -111,9 +113,12 @@ export default {
 		} catch (err) {
 			console.error('Failed to check favorite status:', err);
 		}
+		hideLoading()
 	},
 	methods:{
 		async toggleFavorite() {
+			
+			showLoading()
 			try {
 				const favoriteData = {
 				userId: this.user.id,
@@ -128,6 +133,7 @@ export default {
 				console.error('Failed to toggle favorite:', error);
 				alert('Something went wrong.');
 			}
+			hideLoading()
 		}
 	}
 }

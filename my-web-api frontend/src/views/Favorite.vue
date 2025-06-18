@@ -1,9 +1,9 @@
 <template>
 	<main>
 		<h1 class="title">My Favorites</h1>
-		<div v-if="loading" class="loading">Loading favorites, please wait...</div>
 
-		<div v-else-if="favorites.length" class="movie-container">
+		<p v-if="!loading && favorites.length === 0" class="loading">No favorites found.</p>
+		<div v-else="favorites.length" class="movie-container">
 			<div v-for="movie in favorites" :key="movie.movieId" class="movie-card">
 				<div 
 				class="movie-image" 
@@ -27,22 +27,25 @@
                 <h2 class="movie-title text-center" style="font-size: 16px;">{{ movie.title }}</h2>	
 			</div>
 		</div>
-		<p v-else class="loading">No favorites found.</p>
 	</main>
 </template>
 
 <script>
 import axios from 'axios';
+import { useLoading } from '@/composables/useLoading'
+const { showLoading, hideLoading } = useLoading()
 
 export default {
 	data() {
 		return {
 		favorites: [],
 		userId: '', // Assume populated from auth/user store
-		loading: true
+		loading: false
 		};
 	},
 	async mounted() {
+		showLoading()
+		this.loading = true;
 		const storedUser = localStorage.getItem("user");
 		if (storedUser) {
 			this.user = JSON.parse(storedUser);
@@ -100,16 +103,16 @@ export default {
 				releaseDate: anime.aired.from?.substring(0, 10)
 				});
 			}
+			
+			
 		}
 		
 		} catch (err) {
 			console.error('Failed to load favorites:', err);
 		}
 
-		
-		setTimeout(() => {
-			this.loading = false;
-		}, 200);
+		this.loading = false;
+		hideLoading()
 	},
 	methods: {
 		getRouterLink(movie) {

@@ -33,12 +33,14 @@
         </div>
       </div>
 
-      <p v-else class="loading">Loading TV shows...</p>
     </main>
 </template>
 
 <script>
 import axios from 'axios';
+import { useLoading } from '@/composables/useLoading'
+
+const { showLoading, hideLoading } = useLoading()
 
 export default {
   data() {
@@ -47,6 +49,7 @@ export default {
     };
   },
   async mounted() { 
+    showLoading()
     const options = {
       method: 'GET',
       url: 'https://imdb236.p.rapidapi.com/api/imdb/top250-movies',
@@ -72,6 +75,7 @@ export default {
     } catch (error) {
       console.error('Error fetching TV shows:', error);
     }
+    hideLoading()
   }
 };
 </script>

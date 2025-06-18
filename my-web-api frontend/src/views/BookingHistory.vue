@@ -2,11 +2,7 @@
     <div class="booking-history">
         <h1 class="title">My Booking History</h1>
 
-        <div v-if="loading" class="loading">
-            <p>Loading booking history...</p>
-        </div>
-
-        <div v-else-if="bookings.length === 0" class="loading">
+        <div v-if="!loading && bookings.length === 0" class="loading">
             <p>No booking found.</p>
         </div>
 
@@ -41,6 +37,9 @@
 <script>
 import axios from 'axios';
 
+import { useLoading } from '@/composables/useLoading'
+const { showLoading, hideLoading } = useLoading()
+
 export default {
     data() {
         return {
@@ -59,6 +58,7 @@ export default {
     },
     methods: {
         async fetchBookings(userId) {
+            showLoading()
             try {
                 this.loading = true;
 
@@ -120,6 +120,7 @@ export default {
             } finally {
                 this.loading = false;
             }
+            hideLoading()
         }
     }
 }

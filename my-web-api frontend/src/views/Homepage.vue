@@ -34,7 +34,7 @@
             <div class="movie-grid-with-button">
                 <div class="movie-grid">
                 <div v-for="movie in imdbMovies" :key="movie.id" class="movie-card">
-                    <img :src="movie.image" :alt="movie.title" />
+                    <img :src="movie.image" :alt="movie.title" class="movie-image"/>
                     <h3>{{ movie.title }}</h3>
                     <router-link :to="getRouterLink(movie.id)">Details</router-link>
                 </div>
@@ -53,7 +53,7 @@
             <div class="movie-grid-with-button">
                 <div class="movie-grid">
                 <div v-for="movie in animeMovies" :key="movie.id" class="movie-card">
-                    <img :src="movie.image" :alt="movie.title" />
+                    <img :src="movie.image" :alt="movie.title" class="movie-image"/>
                     <h3>{{ movie.title }}</h3>
                     <router-link :to="getRouterLink(movie.id)">Details</router-link>
                 </div>
@@ -65,7 +65,6 @@
         </section>
     </div>
 
-    <p v-if="loading" class="loading">Loading...</p>
   </div>
 </template>
 
@@ -80,6 +79,9 @@ import 'swiper/css/pagination'
 
 <script>
 import axios from 'axios';
+import { useLoading } from '@/composables/useLoading'
+
+const { showLoading, hideLoading } = useLoading()
 
 console.log(Autoplay)
 
@@ -101,64 +103,65 @@ export default {
   },
   methods: {      
     async fetchData() {
-      this.loading = true;
-      try {
-        // IMDb
-        const imdbOptions = {
-          method: 'GET',
-          url: 'https://imdb236.p.rapidapi.com/api/imdb/top250-movies',
-          headers: {
-            'x-rapidapi-key': '613d9ec67amsh6a60e222647b7f4p1c74ebjsn7c4e57299df7',
-            'x-rapidapi-host': 'imdb236.p.rapidapi.com'
-          }
-        };
-        const imdbRes = await axios.request(imdbOptions);
-        let sortRes = imdbRes.data || [];
+        showLoading()
+        try {
+            // IMDb
+            const imdbOptions = {
+            method: 'GET',
+            url: 'https://imdb236.p.rapidapi.com/api/imdb/top250-movies',
+            headers: {
+                'x-rapidapi-key': '613d9ec67amsh6a60e222647b7f4p1c74ebjsn7c4e57299df7',
+                'x-rapidapi-host': 'imdb236.p.rapidapi.com'
+            }
+            };
+            const imdbRes = await axios.request(imdbOptions);
+            let sortRes = imdbRes.data || [];
 
-        // Sort by release date (newest first)
-        sortRes = sortRes.sort((a, b) => {
-            const dateA = new Date(a.releaseDate);
-            const dateB = new Date(b.releaseDate);
-            return dateB - dateA;
-        });
+            // Sort by release date (newest first)
+            sortRes = sortRes.sort((a, b) => {
+                const dateA = new Date(a.releaseDate);
+                const dateB = new Date(b.releaseDate);
+                return dateB - dateA;
+            });
 
-        // Map after sorting
-        const imdbShows = sortRes.slice(0, 5).map(show => ({
-            id: show.id,
-            title: show.primaryTitle,
-            image: show.primaryImage,
-            type: 'imdb'
-        }));
+            // Map after sorting
+            const imdbShows = sortRes.slice(0, 5).map(show => ({
+                id: show.id,
+                title: show.primaryTitle,
+                image: show.primaryImage,
+                type: 'imdb'
+            }));
 
-        // Anime (Jikan)
-        const animeRes = await axios.get('https://api.jikan.moe/v4/top/anime');
-        const animeShows = animeRes.data.data.slice(0, 5).map(show => ({
-          id: show.mal_id,
-          title: show.title,
-          image: show.images.jpg.image_url,
-          type: 'anime'
-        }));
+            // Anime (Jikan)
+            const animeRes = await axios.get('https://api.jikan.moe/v4/top/anime');
+            const animeShows = animeRes.data.data.slice(0, 5).map(show => ({
+            id: show.mal_id,
+            title: show.title,
+            image: show.images.jpg.image_url,
+            type: 'anime'
+            }));
 
-        this.imdbMovies = imdbShows;
-        this.animeMovies = animeShows;
-        this.nowShowing = [...imdbShows, ...animeShows];
-        this.sliderMovies = [...imdbShows, ...animeShows];
+            this.imdbMovies = imdbShows;
+            this.animeMovies = animeShows;
+            this.nowShowing = [...imdbShows, ...animeShows];
+            this.sliderMovies = [...imdbShows, ...animeShows];
 
 
-      } catch (err) {
-        console.error('API error:', err);
-      } finally {
-        this.loading = false;
-      }
+        } catch (err) {
+            console.error('API error:', err);
+        } finally {
+            this.loading = false;
+        }
+        hideLoading()
     },
     getRouterLink(id) {
-      return id.startsWith?.('tt')
-        ? { name: 'movie-details', params: { id } }
-        : { name: 'details', params: { mal_id: id } };
+        return id.startsWith?.('tt')
+            ? { name: 'movie-details', params: { id } }
+            : { name: 'details', params: { mal_id: id } };
     }
   },
   mounted() {
-    this.fetchData();
+        this.fetchData();
   }
 };
 </script>
@@ -222,10 +225,6 @@ export default {
     color: white;
     padding: 10px;
     text-align: center;
-}
-.movie-card img {
-    width: 100%;
-    height: auto;
 }
 .slider-wrapper {
     width: 100%;    

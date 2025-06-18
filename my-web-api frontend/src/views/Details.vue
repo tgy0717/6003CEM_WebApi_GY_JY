@@ -47,11 +47,12 @@
       </router-link>
     </div>
   </div>
-  <p v-else>Loading movie...</p>
 </template>
 
 <script>
 import axios from 'axios';
+import { useLoading } from '@/composables/useLoading'
+const { showLoading, hideLoading } = useLoading()
 
 export default {
   props: ['mal_id'],
@@ -62,6 +63,7 @@ export default {
     };
   },
   async mounted() {
+    showLoading();
     this.fetchMovieDetails();
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
@@ -79,6 +81,7 @@ export default {
     } catch (err) {
       console.error('Failed to check favorite status:', err);
     }
+    hideLoading()
   },
   methods: {
     fetchMovieDetails() {
