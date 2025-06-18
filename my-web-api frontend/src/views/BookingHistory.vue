@@ -77,7 +77,7 @@ export default {
                     method: 'GET',
                     url: 'https://imdb236.p.rapidapi.com/api/imdb/top250-movies',
                     headers: {
-                        'x-rapidapi-key': '1871f1b3bdmsh9d033733ff8cbf5p118b1djsn1abe42bc11b9',
+                        'x-rapidapi-key': '613d9ec67amsh6a60e222647b7f4p1c74ebjsn7c4e57299df7',
                         'x-rapidapi-host': 'imdb236.p.rapidapi.com'
                     }
                     };

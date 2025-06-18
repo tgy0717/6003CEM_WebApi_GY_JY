@@ -11,6 +11,7 @@
   "dependencies": {
     "@stripe/stripe-js": "^7.3.1",
     "axios": "^1.7.9",
+    "swiper": "^11.2.8",
     "vue": "^3.5.13",
     "vue-axios": "^3.5.2",
     "vue-router": "^4.5.0"

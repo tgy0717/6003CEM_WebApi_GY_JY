@@ -91,22 +91,6 @@ export default {
             });
         },
 
-        getDatabaseApiMovie (){
-            axios.get('http://localhost:5000/api/movie')
-            .then(response => {
-                console.log(response.data)
-                this.FavoriteMovies = response.data.map(movie => ({
-                    mal_id: movie.mal_id,
-                    title: movie.title,
-                    image_url: movie.image_url,
-                    rating: movie.rating || 'Not Rated',
-                    url: movie.url,
-                }));
-            })
-        }
-
-
-
     }
 };
 

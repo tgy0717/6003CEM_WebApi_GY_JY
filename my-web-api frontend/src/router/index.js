@@ -9,6 +9,7 @@ import PaymentSuccessPage from '../views/PaymentSuccess.vue';
 import BookingHistoryPage from "@/views/BookingHistory.vue";
 import ForgetPasswordPage from "@/views/ForgetPassword.vue";
 import Favorite from "@/views/Favorite.vue";
+import Homepage from "@/views/Homepage.vue";
 
 
 const router = createRouter({
@@ -16,6 +17,7 @@ const router = createRouter({
    routes: [
 
       {  path: "/", name: "login", component: LoginPage},
+      {  path: "/home", name: "home", component: Homepage},
       {  path: "/anime-movie", name: "anime-movie", component: AnimeMoviePage},
       {  path: "/registration", name: "registration", component: RegistrationPage},
       {  path: "/details/:mal_id", name: "details", component: () => import("../views/Details.vue"), props: true  },
