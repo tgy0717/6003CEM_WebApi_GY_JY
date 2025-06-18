@@ -1,14 +1,12 @@
 <template>
     <div class="booking-history">
-        <div class="history-title">
-            <h2>My Booking History</h2>
-        </div>
+        <h1 class="title">My Booking History</h1>
 
-        <div v-if="loading" class="loading-message">
+        <div v-if="loading" class="loading">
             <p>Loading booking history...</p>
         </div>
 
-        <div v-else-if="bookings.length === 0" class="no-booking-message">
+        <div v-else-if="bookings.length === 0" class="loading">
             <p>No booking found.</p>
         </div>
 
@@ -129,27 +127,6 @@ export default {
 </script>
 
 <style scoped>
-.history-title {
-  display: flex;
-  justify-content: center; /* Center horizontally */
-  align-items: center;
-  font-size: 20px;
-  font-weight: bold;
-  color: white;
-  margin: 20px;
-  text-align: center;
-}
-
-.no-booking-message,
-.loading-message {
-  display: flex;
-  justify-content: center; /* Center horizontally */
-  align-items: center;
-  font-size: 18px;
-  padding: 20px;
-  text-align: center;
-}
-
 .history-container{
   margin: 20px;
 }

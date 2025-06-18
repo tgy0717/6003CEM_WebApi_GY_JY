@@ -75,11 +75,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-	.loading {
-    text-align: center;
-    font-size: 18px;
-    color: #aaa;
-	}
-</style>

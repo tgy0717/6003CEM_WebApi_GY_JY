@@ -2,7 +2,7 @@
 <template>
     <div class="topbar">
         <div class="topbar-left">
-            <router-link style="text-decoration: none;" to="/home" class="topbar-link" active-class="active-link"><i class="fas fa-home" style="margin-right: 8px;"></i> Homepage</router-link>
+            <router-link style="text-decoration: none;" to="/home" class="topbar-link" active-class="active-link"><font-awesome-icon icon="fa-solid fa-house" style="margin-right: 8px;"></font-awesome-icon> Homepage</router-link>
             <router-link style="text-decoration: none;" to="/movie" class="topbar-link" active-class="active-link">Top IMDB Movie</router-link>
             <router-link style="text-decoration: none;" to="/anime-movie" class="topbar-link" active-class="active-link">Top Anime Movie</router-link>
         </div>

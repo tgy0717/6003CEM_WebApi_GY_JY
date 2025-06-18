@@ -63,13 +63,25 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 // Sample Route
 app.get("/api/movie", async (req, res) => {
-        try {
-                const movies = await Movie.find(); 
-                res.json(movies); 
-        } catch (err) {
-                res.status(500).json({ message: err.message });
-        }
+  try {
+    const movies = await Movie.find(); 
+    res.json(movies); 
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
+
+// Password validation
+function validatePassword(password) {
+  const minLength = 8;
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/;
+
+  if (password.length < minLength || !hasSpecialChar.test(password)) {
+      return false;
+  }
+
+  return true;
+}
 
 function generateVerificationCode() {
     return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit
@@ -85,79 +97,75 @@ function verifyStoredCode(email, userCode) {
 
 // Send Verification Email
 async function sendVerificationEmail(receiverEmail, receiverName) {
-    const code = generateVerificationCode();
-    storeVerificationCode(receiverEmail, code);
+  const code = generateVerificationCode();
+  storeVerificationCode(receiverEmail, code);
 
-    const transporter = nodemailer.createTransport({
-        // service: "gmail",
-        // auth: {
-        //     user: process.env.SENDER_EMAIL,
-        //     pass: process.env.SMTP_PASSWORD,
-        // },
-        host: "smtp.gmail.com",
-        port: 587, // Use TLS
-        secure: false, // TLS requires this to be false
-        auth: {
-            user: process.env.SENDER_EMAIL,
-            pass: process.env.SMTP_PASSWORD, // Must be an App Password if using 2FA
-        },
-    });
+  const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587, // Use TLS
+    secure: false, // TLS requires this to be false
+    auth: {
+        user: process.env.SENDER_EMAIL,
+        pass: process.env.SMTP_PASSWORD, // Must be an App Password if using 2FA
+    },
+  });
 
-    const mailOptions = {
-        from: `"Cinema App" <${process.env.SENDER_EMAIL}>`,
-        to: receiverEmail,
-        subject: "Cinema App - Password Reset Code",
-        html: `
-            <p>Hi ${receiverName},</p>
-            <p>Your password reset code is: <strong>${code}</strong></p>
-            <p>If you did not request this, please ignore this email.</p>
-        `,
-    };
+  const mailOptions = {
+    from: `"Cinema App" <${process.env.SENDER_EMAIL}>`,
+    to: receiverEmail,
+    subject: "Cinema App - Password Reset Code",
+    html: `
+        <p>Hi ${receiverName},</p>
+        <p>Your password reset code is: <strong>${code}</strong></p>
+        <p>If you did not request this, please ignore this email.</p>
+    `,
+  };
 
-    await transporter.sendMail(mailOptions);
+  await transporter.sendMail(mailOptions);
 }
 
 // Forget password (Enter email)
 app.post('/api/forgot-password', async (req, res) => {
-    const { email } = req.body;
+  const { email } = req.body;
 
-    if (!email) return res.status(400).json({ message: "Email is required." });
+  if (!email) return res.status(400).json({ message: "Email is required." });
 
-    try {
-        const user = await User.findOne({ email });
+  try {
+    const user = await User.findOne({ email });
 
-        if (!user) return res.status(404).json({ message: "Email not found." });
+    if (!user) return res.status(404).json({ message: "Email not found." });
 
-        await sendVerificationEmail(user.email, user.username || user.email.split('@')[0]);
+    await sendVerificationEmail(user.email, user.username || user.email.split('@')[0]);
 
-        return res.status(200).json({ message: "Verification email sent successfully." });
-    } catch (error) {
-        console.error("Forgot Password Error:", error);
-        return res.status(500).json({ message: "Internal server error." });
-    }
+    return res.status(200).json({ message: "Verification email sent successfully." });
+  } catch (error) {
+    console.error("Forgot Password Error:", error);
+    return res.status(500).json({ message: "Internal server error." });
+  }
 });
 
 // Verify Code
 app.post('/api/verify-code', async (req, res) => {
-    const { email, code } = req.body;
+  const { email, code } = req.body;
 
-    if (!code) return res.status(400).json({ message: "Verification code is required." });
+  if (!code) return res.status(400).json({ message: "Verification code is required." });
 
-    const storedCode = verification_codes[email];
-    if (!storedCode) {
-        return res.status(400).json({ message: "No verification code found. Please request a new one." });
-    }
+  const storedCode = verification_codes[email];
+  if (!storedCode) {
+    return res.status(400).json({ message: "No verification code found. Please request a new one." });
+  }
 
-    if (!verifyStoredCode(email, code)) {
-        return res.status(400).json({ message: "Invalid verification code." });
-    }
+  if (!verifyStoredCode(email, code)) {
+    return res.status(400).json({ message: "Invalid verification code." });
+  }
 
-    // Remove code after successful verification
-    delete verification_codes[email];
+  // Remove code after successful verification
+  delete verification_codes[email];
 
-    res.status(200).json({ message: "Verification successful. You may reset your password now." });
+  res.status(200).json({ message: "Verification successful. You may reset your password now." });
 });
 
+// Reset Password
 app.post('/api/reset-password', async (req, res) => {
     const { email, new_password, confirm_password } = req.body;
 
@@ -169,66 +177,78 @@ app.post('/api/reset-password', async (req, res) => {
         return res.status(400).json({ message: "Passwords do not match." });
     }
 
+    if (!validatePassword(new_password)) {
+      return res.status(400).json({
+        message: "Password must be at least 8 characters long and contain at least one special character.",
+      });
+    }
+
     try {
-        const hashedPassword = await bcrypt.hash(new_password, 10);
+      const hashedPassword = await bcrypt.hash(new_password, 10);
 
-        const user = await User.findOneAndUpdate(
-            { email },
-            { password: hashedPassword },
-            { new: true }
-        );
+      const user = await User.findOneAndUpdate(
+          { email },
+          { password: hashedPassword },
+          { new: true }
+      );
 
-        if (!user) {
-            return res.status(404).json({ message: "User not found." });
-        }
+      if (!user) {
+          return res.status(404).json({ message: "User not found." });
+      }
 
-        return res.status(200).json({ message: "Password changed successfully." });
+      return res.status(200).json({ message: "Password changed successfully." });
     } catch (error) {
-        console.error("Reset Password Error:", error);
-        return res.status(500).json({ message: "Internal server error." });
+      console.error("Reset Password Error:", error);
+      return res.status(500).json({ message: "Internal server error." });
     }
 });
 
 
 // Login
 app.post("/api/login", async (req, res) => {
-        const { email, password } = req.body;
+  const { email, password } = req.body;
 
-        try {
-                const user = await User.findOne({email});
-                if(!user){
-                        return res.status(404).json({ message: "User not found." });
-                }
+  try {
+    const user = await User.findOne({email});
+    if(!user){
+            return res.status(404).json({ message: "User not found." });
+    }
 
-                const isPasswordValid = await bcrypt.compare(password, user.password);
-                if(!isPasswordValid){
-                        return res.status(404).json({ message: "Invalid password." });
-                }
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if(!isPasswordValid){
+            return res.status(404).json({ message: "Invalid password." });
+    }
 
-                res.status(200).json({ message: "Login successful", user: { id: user._id, username: user.username, email: user.email } });
-        } catch (err) {
-                res.status(500).json({ message: err.message });
-        }
+    res.status(200).json({ message: "Login successful", user: { id: user._id, username: user.username, email: user.email } });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 // Registration
 app.post("/api/register", async(req, res) => {
-        const { username, email, password } = req.body;
+  const { username, email, password } = req.body;
 
-        try{
-                const existingUser = await User.findOne({email});
-                if(existingUser){
-                        return res.status(400).json({message: "Email already exists."});
-                }
+  try{
+    if (!validatePassword(password)) {
+      return res.status(400).json({
+        message: "Password must be at least 8 characters long and contain at least one special character.",
+      });
+    }
 
-                const hashedPassword = await bcrypt.hash(password, 10);
-                const newUser = new User({username, email, password: hashedPassword});
-                await newUser.save();
+    const existingUser = await User.findOne({email});
+    if(existingUser){
+            return res.status(400).json({message: "Email already exists."});
+    }
 
-                res.status(201).json({message: "User registred successfully!"});
-        }catch(err){
-                res.status(500).json({message: err.message});
-        }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({username, email, password: hashedPassword});
+    await newUser.save();
+
+    res.status(201).json({message: "User registred successfully!"});
+  }catch(err){
+    res.status(500).json({message: err.message});
+  }
 });
 
 // Save Booking
@@ -237,11 +257,9 @@ app.post('/api/verify-and-save-booking', async (req, res) => {
 
   try {
     // 1. Retrieve Stripe session (with expanded line_items)
-//     console.log('[Debug] Fetching Stripe session...');
     const session = await stripe_key.checkout.sessions.retrieve(sessionId, {
       expand: ['line_items.data.price.product']
     });
-//     console.log('[Debug] Stripe session retrieved:', JSON.stringify(session, null, 2));
 
     // 2. Validate payment status
     if (session.payment_status !== 'paid') {
@@ -250,14 +268,12 @@ app.post('/api/verify-and-save-booking', async (req, res) => {
     }
 
     // 3. Safely extract metadata
-//     console.log('[Debug] Extracting line items...');
     const lineItem = session.line_items?.data?.[0];
     if (!lineItem) {
       console.error('[Error] No line items found in session:', sessionId);
       return res.status(400).json({ error: 'No line items found' });
     }
 
-//     console.log('[Debug] Extracting product metadata...');
     const productMetadata = lineItem.price?.product?.metadata;
     if (!productMetadata) {
       console.error('[Error] Product metadata missing in line item:', lineItem);
@@ -271,7 +287,6 @@ app.post('/api/verify-and-save-booking', async (req, res) => {
       bookingDate, 
       quantity 
     } = productMetadata;
-//     console.log('[Debug] Extracted metadata:', { movieId, userId, cinema, bookingDate, quantity });
 
     // 4. Save booking to database
     console.log('[Debug] Creating booking record...');
@@ -287,7 +302,6 @@ app.post('/api/verify-and-save-booking', async (req, res) => {
     });
 
     const savedBooking = await newBooking.save();
-//     console.log('[Success] Booking saved:', savedBooking);
     res.status(201).json({ message: 'Booking saved successfully', booking: savedBooking });
 
   } catch (error) {
@@ -304,6 +318,7 @@ app.post('/api/verify-and-save-booking', async (req, res) => {
   }
 });
 
+// Update Profile
 app.put("/api/users/:id", async (req, res) => {
   
   console.log("Received profile update:", req.body);
@@ -323,6 +338,7 @@ app.put("/api/users/:id", async (req, res) => {
   }
 });
 
+// Change Password
 app.put("/api/users/:id/password", async (req, res) => {
   const { oldPassword, newPassword, confirmPassword } = req.body;
 
@@ -335,6 +351,12 @@ app.put("/api/users/:id/password", async (req, res) => {
 
     if (newPassword !== confirmPassword) {
       return res.status(400).json({ message: "Passwords do not match." });
+    }
+
+    if (!validatePassword(newPassword)) {
+      return res.status(400).json({
+        message: "Password must be at least 8 characters long and contain at least one special character.",
+      });
     }
 
     user.password = await bcrypt.hash(newPassword, 10);

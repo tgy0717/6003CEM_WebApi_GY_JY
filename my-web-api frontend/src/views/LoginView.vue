@@ -21,15 +21,6 @@
                     <router-link to="/forgot-password" class="forgot-password-button">Forgot password?</router-link>
                 </div>
                 <button type="submit" class="login-button">Login</button>
-        
-                <!-- <span style="text-align: center; font-size: 12px; color:black">OR</span>
-        
-                <div class="google-btn-container">
-                  <button @click="handleGoogleLogin" class="google-btn">
-                    <img class="google-icon" src="https://cdn.pixabay.com/photo/2021/05/24/09/15/google-logo-6278331_1280.png" alt="Google Logo">
-                    <span class="google-text">Sign in with Google</span>
-                  </button>
-                </div> -->
 
                 <div class="register-container">
                     <router-link to="/registration" class="register-button">Do not have an account?</router-link>
@@ -62,7 +53,7 @@ export default {
                 // Store user in localStorage
                 localStorage.setItem("user", JSON.stringify(response.data.user));
 
-                router.push("/movie"); // Redirect to homepage or dashboard
+                router.push("/home"); // Redirect to homepage or dashboard
             } catch (error) {
                 alert(error.response?.data?.message || "Login failed");
             }

@@ -65,7 +65,7 @@
         </section>
     </div>
 
-    <p v-if="loading">Loading...</p>
+    <p v-if="loading" class="loading">Loading...</p>
   </div>
 </template>
 
@@ -343,5 +343,4 @@ export default {
 .arrow{
     font-size: xx-large;
 }
-
 </style>
