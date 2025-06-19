@@ -11,7 +11,7 @@
       </select>
 
       <label for="date">Date:</label>
-      <input type="date" v-model="date" id="date" />
+      <input type="date" v-model="date" :min="today" id="date" />
 
       <button @click="confirmSelection" :disabled="!cinema || !date">Confirm</button>
     </div>
@@ -92,6 +92,9 @@ export default {
       if (!this.date) return '';
       const options = { year: 'numeric', month: 'long', day: 'numeric' };
       return new Date(this.date).toLocaleDateString(undefined, options);
+    },
+    today() {
+      return new Date().toISOString().split('T')[0]; // YYYY-MM-DD
     }
   },
   mounted() {
