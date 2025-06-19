@@ -53,6 +53,7 @@
 import axios from 'axios';
 import { useLoading } from '@/composables/useLoading'
 const { showLoading, hideLoading } = useLoading()
+const token = localStorage.getItem("token");
 
 export default {
   props: ['mal_id'],
@@ -73,8 +74,11 @@ export default {
     try {
       const res = await axios.get('http://localhost:5000/api/is-favorite', {
         params: {
-          userId: this.user.id,
+          // userId: this.user.id,
           movieId: movieId,
+        },
+        headers: {
+          Authorization: `Bearer ${token}`
         }
       });
       this.isFavorite = res.data.isFavorite;
@@ -100,11 +104,19 @@ export default {
     async toggleFavorite() {
       try {
         const favoriteData = {
-          userId: this.user.id,
+          // userId: this.user.id,
           movieId: this.mal_id || this.id,
         };
         console.log(favoriteData)
-        const response = await axios.post('http://localhost:5000/api/toggle-favorite', favoriteData);
+        const response = await axios.post(
+          'http://localhost:5000/api/toggle-favorite', 
+          favoriteData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
         this.isFavorite = !this.isFavorite;
 
         alert(response.data.message);

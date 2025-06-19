@@ -18,7 +18,7 @@
                             <h2>{{ booking.movieTitle }}</h2>
                             <p><span class="label">Cinema: {{ booking.cinema }}</span></p>
                             <p><span class="label">Date: {{ booking.bookingDate }}</span></p>
-                            <p><span class="label">Ticket(s): Normal x{{ booking.quantity }}</span></p>
+                            <p><span class="label">Ticket(s): Normal x {{ booking.quantity }}</span></p>
                         </div>
                         <div class="paymentStatus">
                             {{ booking.paymentStatus }}
@@ -39,6 +39,7 @@ import axios from 'axios';
 
 import { useLoading } from '@/composables/useLoading'
 const { showLoading, hideLoading } = useLoading()
+const token = localStorage.getItem("token");
 
 export default {
     data() {
@@ -60,10 +61,14 @@ export default {
         async fetchBookings(userId) {
             showLoading()
             try {
+                console.log("Token:", token);
                 this.loading = true;
 
                 const response = await axios.get('http://localhost:5000/api/get-booking', {
-                params: { userId }
+                    // params: { userId },
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
                 });
 
                 const bookings = response.data;

@@ -34,6 +34,7 @@
 import axios from 'axios';
 import { useLoading } from '@/composables/useLoading'
 const { showLoading, hideLoading } = useLoading()
+const token = localStorage.getItem("token")
 
 export default {
 	data() {
@@ -51,8 +52,12 @@ export default {
 			this.user = JSON.parse(storedUser);
 		}
 		try {
+			console.log("Token: ", token);
 			const response = await axios.get('http://localhost:5000/api/get-favorites', {
-			params: { userId: this.user.id }
+			// params: { userId: this.user.id }
+			headers: {
+				Authorization: `Bearer ${token}`
+			}
 		});
 
 		const favoriteList = response.data;

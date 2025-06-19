@@ -9,6 +9,7 @@
 
 <script>
 import axios from 'axios'; 
+const token = localStorage.getItem("token");
 
 export default {
   name: "PaymentSuccess",
@@ -22,9 +23,15 @@ export default {
     }
 
     try{
-        const response = await axios.post('http://localhost:5000/api/verify-and-save-booking', {
-            sessionId,
-        });
+        const response = await axios.post(
+          'http://localhost:5000/api/verify-and-save-booking',
+          { sessionId },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
     } catch(error) {
         alert('Failed to confirm booking: ' + error.message);
     }

@@ -50,8 +50,9 @@ export default {
 
                 alert(response.data.message); // notify success
 
-                // Store user in localStorage
+                // Store user and token in localStorage
                 localStorage.setItem("user", JSON.stringify(response.data.user));
+                localStorage.setItem("token", response.data.token);
 
                 router.push("/home"); // Redirect to homepage or dashboard
             } catch (error) {

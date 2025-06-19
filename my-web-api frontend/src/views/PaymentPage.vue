@@ -38,7 +38,7 @@
 
             <p><span class="label">Cinema: {{ cinema }}</span></p>
             <p><span class="label">Date: {{ formattedDate }}</span></p>
-            <p><span class="label">Ticket(s): Normal x{{ quantity }}</span></p>
+            <p><span class="label">Ticket(s): Normal x {{ quantity }}</span></p>
           </div>
           <div class="price">
             <p>RM {{ totalPrice.toFixed(2) }}</p>
@@ -68,6 +68,7 @@
 <script>
 import axios from 'axios';
 import { loadStripe } from '@stripe/stripe-js';
+const token = localStorage.getItem("token");
 
 export default {
   props: ['mal_id', 'id'],
@@ -156,15 +157,22 @@ export default {
     },
     async pay() {
       try {
-        const response = await axios.post('http://localhost:5000/api/create-checkout-session', {
-          movieId: this.mal_id || this.id,
-          movieTitle: this.movie.title || this.movie.primaryTitle,
-          price: this.totalPrice,
-          userId: this.user.id,
-          quantity: this.quantity,
-          cinema: this.cinema,
-          bookingDate: this.date
-        });
+        const response = await axios.post('http://localhost:5000/api/create-checkout-session', 
+          {
+            movieId: this.mal_id || this.id,
+            movieTitle: this.movie.title || this.movie.primaryTitle,
+            price: this.totalPrice,
+            userId: this.user.id,
+            quantity: this.quantity,
+            cinema: this.cinema,
+            bookingDate: this.date
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
 
         const sessionId = response.data.id;
         const { error } = await this.stripe.redirectToCheckout({ sessionId });

@@ -8,9 +8,14 @@ const nodemailer = require("nodemailer");
 const User = require("./Model/User");
 const Booking = require("./Model/Booking");
 const Favorite = require("./Model/Favorite");
+
 // Payment API
 const Stripe = require('stripe');
 const stripe_key = Stripe(process.env.STRIPE_SECRET_KEY);
+
+// JWT Token
+const jwt = require("jsonwebtoken");
+const secretKey = process.env.JWT_SECRET;
 
 const app = express();
 app.use(express.json());
@@ -27,9 +32,29 @@ mongoose.connect(process.env.MONGO_URI, {
 // Arrays that used to store verification code
 const verification_codes = {}
 
+// Generate token
+function generateToken(user) {
+  return jwt.sign({ id: user._id, email: user.email }, secretKey, { expiresIn: '1h' });
+}
+
+// Authenticate token
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) return res.status(401).json({ message: 'Access token required' });
+
+  jwt.verify(token, secretKey, (err, user) => {
+    if (err) return res.status(403).json({ message: 'Invalid or expired token' });
+    req.user = user;
+    next();
+  });
+}
+
 // Payment API
-app.post('/api/create-checkout-session', async (req, res) => {
-  const { movieId, movieTitle, price, userId, quantity, cinema, bookingDate } = req.body;
+app.post('/api/create-checkout-session', authenticateToken, async (req, res) => {
+  const userId = req.user.id;
+  const { movieId, movieTitle, price, quantity, cinema, bookingDate } = req.body;
 
   try {
     const session = await stripe_key.checkout.sessions.create({
@@ -72,14 +97,17 @@ function validatePassword(password) {
   return true;
 }
 
+// Generate Verification Code
 function generateVerificationCode() {
     return Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit
 }
 
+// Store Verification Code
 function storeVerificationCode(email, code) {
     verification_codes[email] = code;
 }
 
+// Verify Verification Code
 function verifyStoredCode(email, userCode) {
     return verification_codes[email] === userCode;
 }
@@ -192,7 +220,6 @@ app.post('/api/reset-password', async (req, res) => {
     }
 });
 
-
 // Login
 app.post("/api/login", async (req, res) => {
   const { email, password } = req.body;
@@ -208,7 +235,13 @@ app.post("/api/login", async (req, res) => {
             return res.status(404).json({ message: "Invalid password." });
     }
 
-    res.status(200).json({ message: "Login successful", user: { id: user._id, username: user.username, email: user.email } });
+    const token = generateToken(user);
+
+    res.status(200).json({ 
+      message: "Login successful", 
+      token,
+      user: { id: user._id, username: user.username, email: user.email } 
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -241,7 +274,7 @@ app.post("/api/register", async(req, res) => {
 });
 
 // Save Booking
-app.post('/api/verify-and-save-booking', async (req, res) => {
+app.post('/api/verify-and-save-booking', authenticateToken, async (req, res) => {
   const { sessionId } = req.body;
 
   try {
@@ -308,7 +341,7 @@ app.post('/api/verify-and-save-booking', async (req, res) => {
 });
 
 // Update Profile
-app.put("/api/users/:id", async (req, res) => {
+app.put("/api/users/:id", authenticateToken, async (req, res) => {
   
   console.log("Received profile update:", req.body);
   const { username, email } = req.body;
@@ -328,7 +361,7 @@ app.put("/api/users/:id", async (req, res) => {
 });
 
 // Change Password
-app.put("/api/users/:id/password", async (req, res) => {
+app.put("/api/users/:id/password", authenticateToken, async (req, res) => {
   const { oldPassword, newPassword, confirmPassword } = req.body;
 
   try {
@@ -358,8 +391,9 @@ app.put("/api/users/:id/password", async (req, res) => {
 });
 
 // Get booking
-app.get('/api/get-booking', async (req, res) => {
-  const { userId } = req.query;
+app.get('/api/get-booking', authenticateToken, async (req, res) => {
+  // const { userId } = req.query;
+  const userId = req.user.id;
 
   console.log("User ID:", userId);
 
@@ -379,8 +413,9 @@ app.get('/api/get-booking', async (req, res) => {
 
 });
 
-app.post('/api/toggle-favorite', async (req, res) => {
-  const { userId, movieId } = req.body;
+app.post('/api/toggle-favorite', authenticateToken, async (req, res) => {
+  const userId = req.user.id;
+  const { movieId } = req.body;
 
   try {
     const exists = await Favorite.findOne({ userId, movieId });
@@ -399,8 +434,9 @@ app.post('/api/toggle-favorite', async (req, res) => {
   }
 });
 
-app.get('/api/is-favorite', async (req, res) => {
-  const { userId, movieId } = req.query;
+app.get('/api/is-favorite', authenticateToken, async (req, res) => {
+  const userId = req.user.id;
+  const { movieId } = req.query;
 
   try {
     const exists = await Favorite.findOne({ userId, movieId });
@@ -411,8 +447,11 @@ app.get('/api/is-favorite', async (req, res) => {
   }
 });
 
-app.get('/api/get-favorites', async (req, res) => {
-  const { userId } = req.query;
+app.get('/api/get-favorites', authenticateToken, async (req, res) => {
+  // const { userId } = req.query;
+  const userId = req.user.id;
+
+  console.log("User ID: ", userId);
 
   if (!userId) {
     return res.status(400).json({ message: 'Missing userId' });

@@ -64,6 +64,7 @@
 
 <script>
 import axios from "axios";
+const token = localStorage.getItem("token");
 
 export default {
   name: "UserProfile",
@@ -109,7 +110,15 @@ export default {
       };
       
       try {
-        const response = await axios.put(`http://localhost:5000/api/users/${this.editableUser._id}`, payload);
+        const response = await axios.put(
+          `http://localhost:5000/api/users/${this.editableUser._id}`, 
+          payload,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
         console.log(response)
         alert(response.data.message || "Profile updated successfully!");
         localStorage.setItem("user", JSON.stringify(response.data.user));
@@ -138,7 +147,15 @@ export default {
       };
 
       try {
-        const response = await axios.put(`http://localhost:5000/api/users/${this.editableUser._id}/password`, payload);
+        const response = await axios.put(
+          `http://localhost:5000/api/users/${this.editableUser._id}/password`, 
+          payload,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
         alert(response.data.message || "Password changed successfully!");
 
         // Clear and close dialog
