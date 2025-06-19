@@ -5,7 +5,6 @@ const cors = require("cors");
 const bcrypt = require("bcrypt");
 const nodemailer = require("nodemailer");
 
-const Movie = require("./Model/Movie");
 const User = require("./Model/User");
 const Booking = require("./Model/Booking");
 const Favorite = require("./Model/Favorite");
@@ -60,16 +59,6 @@ app.post('/api/create-checkout-session', async (req, res) => {
 // Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-// Sample Route
-app.get("/api/movie", async (req, res) => {
-  try {
-    const movies = await Movie.find(); 
-    res.json(movies); 
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
 
 // Password validation
 function validatePassword(password) {
