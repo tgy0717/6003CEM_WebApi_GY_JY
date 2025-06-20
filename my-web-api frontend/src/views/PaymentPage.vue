@@ -68,7 +68,6 @@
 <script>
 import axios from 'axios';
 import { loadStripe } from '@stripe/stripe-js';
-const token = localStorage.getItem("token");
 
 export default {
   props: ['mal_id', 'id'],
@@ -157,12 +156,12 @@ export default {
     },
     async pay() {
       try {
+        const token = localStorage.getItem("token");
         const response = await axios.post('http://localhost:5000/api/create-checkout-session', 
           {
             movieId: this.mal_id || this.id,
             movieTitle: this.movie.title || this.movie.primaryTitle,
             price: this.totalPrice,
-            userId: this.user.id,
             quantity: this.quantity,
             cinema: this.cinema,
             bookingDate: this.date
