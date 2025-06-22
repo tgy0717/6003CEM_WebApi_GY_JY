@@ -4,5 +4,5 @@
 3. User can view movie details, buy movie tickets, add movie to favourite list, view booking history, and update profile.
 
 # To run the project:
-Frontend: Go to my-web-api frontend folder, then run the command "npm run dev".
-Backend: Go to my-web-api backend folder, then run the command "node server.js".
+1. Frontend: Go to my-web-api frontend folder, then run the command "npm run dev".
+2. Backend: Go to my-web-api backend folder, then run the command "node server.js".
