@@ -9,5 +9,5 @@
 
 # API Keys
 1. Payment API: https://docs.stripe.com/
-2. IDMB API: 
-3. Anime API: 
+2. IDMB API: https://rapidapi.com/octopusteam-octopusteam-default/api/imdb236/playground/apiendpoint_b5d4ed65-5971-4079-9b07-6c7c94340e51
+3. Anime API: https://jikan.moe/
