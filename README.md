@@ -6,3 +6,8 @@
 # To run the project:
 1. Frontend: Go to my-web-api frontend folder, then run the command "npm run dev".
 2. Backend: Go to my-web-api backend folder, then run the command "node server.js".
+
+# API Keys
+1. Payment API: https://docs.stripe.com/
+2. IDMB API: 
+3. Anime API: 
